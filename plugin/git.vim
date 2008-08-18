@@ -226,6 +226,18 @@ function! s:Expand(expr)
     endif
 endfunction
 
+function! GitGrep(arg, ...)
+  let gtmp = &grepprg
+  let &grepprg = 'git-grep --cached -n'
+
+  let find_dir = <SID>GetGitDir() . '/../'
+  if a:0 | let find_dir .= a:1 | endif
+  silent execute ':lcd ' . find_dir 
+  silent execute ':grep! '.a:arg
+  silent execute ':lcd -'
+  let &grepprg = gtmp
+endfunction
+
 command! -nargs=1 -complete=customlist,ListGitCommits GitCheckout call GitCheckout(<q-args>)
 command! -nargs=* -complete=customlist,ListGitCommits GitDiff     call GitDiff(<q-args>)
 command!          GitStatus           call GitStatus()
@@ -236,3 +248,6 @@ command! -nargs=1 GitCatFile          call GitCatFile(<q-args>)
 command! -nargs=+ Git                 call GitDoCommand(<q-args>)
 command!          GitVimDiffMerge     call GitVimDiffMerge()
 command!          GitVimDiffMergeDone call GitVimDiffMergeDone()
+command! -nargs=+ GitGrep             call GitGrep(<q-args>)
+
+
